@@ -52,6 +52,22 @@ export class UserResolver {
     const user = em.create(User, { 
       username: options.usrename, password: hashedPassword 
     })
+    if (options.usrename.length <= 2) {
+      return {
+        errors: [{
+          field: 'username',
+          message: 'length must be greater then 2'
+        }]
+      }
+    }
+    if (options.password.length <= 2) {
+      return {
+        errors: [{
+          field: 'password',
+          message: 'length must be greater then 2'
+        }]
+      }
+    }
     try {
       await em.persistAndFlush(user)
     } catch (err) {
