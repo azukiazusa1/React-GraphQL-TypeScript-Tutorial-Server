@@ -4,9 +4,9 @@ import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } fro
 import argon2 from 'argon2'
 
 @InputType()
-class UserNamePasswordInput {
+class UsernamePasswordInput {
   @Field()
-  usrename: string
+  username: string
   @Field()
   password: string
 }
@@ -45,14 +45,14 @@ export class UserResolver {
   }
   @Mutation(() => UserResponse)
   async register(
-    @Arg('options', () => UserNamePasswordInput) options: UserNamePasswordInput,
+    @Arg('options', () => UsernamePasswordInput) options: UsernamePasswordInput,
     @Ctx() { em }: MyContext
   ): Promise<UserResponse> {
     const hashedPassword = await argon2.hash(options.password)
     const user = em.create(User, { 
-      username: options.usrename, password: hashedPassword 
+      username: options.username, password: hashedPassword 
     })
-    if (options.usrename.length <= 2) {
+    if (options.username.length <= 2) {
       return {
         errors: [{
           field: 'username',
@@ -86,10 +86,10 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg('options', () => UserNamePasswordInput) options: UserNamePasswordInput,
+    @Arg('options', () => UsernamePasswordInput) options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    if (options.usrename.length <= 2) {
+    if (options.username.length <= 2) {
       return {
         errors: [{
           field: 'username',
@@ -97,7 +97,7 @@ export class UserResolver {
         }]
       }
     }
-    const user = await em.findOne(User, { username: options.usrename })
+    const user = await em.findOne(User, { username: options.username })
     if (!user) {
       return {
         errors: [{
