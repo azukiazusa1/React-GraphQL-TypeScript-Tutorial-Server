@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { __prod__ } from "src/constants";
 
-export const sendEmail = async(to: string, text: string) => {
+export const sendEmail = async(to: string, html: string) => {
   // const testAccount = await nodemailer.createTestAccount()
   // console.log('testAccount', testAccount)
 
@@ -19,7 +19,7 @@ export const sendEmail = async(to: string, text: string) => {
     from: '"Fred foo" <foo@example.com>',
     to,
     subject: "Change password",
-    text,
+    html,
   })
 
   console.log('Message send : %s"', info.messageId)
