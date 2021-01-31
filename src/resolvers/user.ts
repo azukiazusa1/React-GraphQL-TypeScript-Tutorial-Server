@@ -2,6 +2,7 @@ import { User } from "../entities/User";
 import { MyContext } from "../types";
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import argon2 from 'argon2'
+import { COOKIE_NAME } from "../constants";
 
 @InputType()
 class UsernamePasswordInput {
@@ -40,7 +41,7 @@ export class UserResolver {
       return null
     }
 
-    const user = em.findOne(User, { id :req.session.userId })
+    const user = em.findOne(User, { id: req.session.userId })
     return user
   }
   @Mutation(() => UserResponse)
@@ -49,8 +50,8 @@ export class UserResolver {
     @Ctx() { em }: MyContext
   ): Promise<UserResponse> {
     const hashedPassword = await argon2.hash(options.password)
-    const user = em.create(User, { 
-      username: options.username, password: hashedPassword 
+    const user = em.create(User, {
+      username: options.username, password: hashedPassword
     })
     if (options.username.length <= 2) {
       return {
@@ -131,5 +132,21 @@ export class UserResolver {
     req.session!.userId = user.id
 
     return { user }
+  }
+
+  @Mutation(() => Boolean)
+  logout(
+    @Ctx() { req, res }: MyContext
+  ) {
+    return new Promise(resolve => req.session.destroy(err => {
+      res.clearCookie(COOKIE_NAME)
+      if (err) {
+        resolve(false)
+        console.error(err)
+        return
+      }
+
+      resolve(true)
+    }))
   }
 }
