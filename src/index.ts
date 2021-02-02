@@ -16,7 +16,7 @@ import { Post } from './entities/Post'
 import { User } from './entities/User'
 
 const main = async () => {
-  const conn = await createConnection({
+  await createConnection({
     type: 'postgres',
     'database': 'lireddit2',
     username: 'postgres',
@@ -25,7 +25,6 @@ const main = async () => {
     synchronize: true,
     entities: [Post, User]
   })
-  console.log(conn)
 
   const app = express()
 
