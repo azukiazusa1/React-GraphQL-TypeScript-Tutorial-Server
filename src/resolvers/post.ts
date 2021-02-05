@@ -144,9 +144,9 @@ export class PostResolver {
 
   @Query(() => Post, { nullable: true })
   post(
-    @Arg('id') id: number,
+    @Arg('id', () => Int) id: number,
   ): Promise<Post | undefined> {
-    return Post.findOne(id)
+    return Post.findOne(id, { relations: ["creator"]})
   }
 
   @Mutation(() => Post)
@@ -176,10 +176,18 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   async deletePost(
-    @Arg('id') id: number,
+    @Arg('id', () => Int) id: number,
+    @Ctx() { req } : MyContext
   ): Promise<boolean> {
+    // const post = await Post.findOne(id)
+    // if (!post) {
+    //   return false
+    // }
+    // if (post.creatorId !== req.session.userId) {
+    //   return false
+    // }
     try {
-      await Post.delete(id)
+      await Post.delete({ id, creatorId: req.session.userId })
       return true 
     } catch {
       return false
